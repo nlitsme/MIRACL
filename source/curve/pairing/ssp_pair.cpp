@@ -212,6 +212,11 @@ void force(ZZn& x,ZZn& y,ECn& A)
 
 void extract(ECn& A,ZZn& x,ZZn& y)
 { // (x,y) <- A
+	if (A.iszero())
+	{
+		x=0; y=0;
+		return;
+	}
     x=(A.get_point())->X;
     y=(A.get_point())->Y;
 }
@@ -675,7 +680,7 @@ int GT::spill(char *& bytes)
 {
 	int i,j,n=(1<<WINDOW_SIZE);
 	int bytes_per_big=(MIRACL/8)*(get_mip()->nib-1);
-	int len=n*2*bytes_per_big;
+	int len=n*2*bytes_per_big+1;
 	Big x,y;
 
 	if (etable==NULL) return 0;
@@ -689,6 +694,7 @@ int GT::spill(char *& bytes)
 		to_binary(y,bytes_per_big,&bytes[j],TRUE);
 		j+=bytes_per_big;
 	}
+	bytes[j]=etbits;
 	delete [] etable; 
 	etable=NULL;
 	return len;
@@ -702,7 +708,7 @@ void GT::restore(char *bytes)
 {
 	int i,j,n=(1<<WINDOW_SIZE);
 	int bytes_per_big=(MIRACL/8)*(get_mip()->nib-1);
-	int len=n*2*bytes_per_big;
+//	int len=n*2*bytes_per_big;
 	Big x,y;
 	if (etable!=NULL) return;
 
@@ -715,6 +721,7 @@ void GT::restore(char *bytes)
 		j+=bytes_per_big;
 		etable[i].set(x,y);
 	}
+	etbits=bytes[j];
 	delete [] bytes;
 }
 
@@ -726,7 +733,7 @@ int G1::spill(char *& bytes)
 {
 	int i,j,n=(1<<WINDOW_SIZE);
 	int bytes_per_big=(MIRACL/8)*(get_mip()->nib-1);
-	int len=n*2*bytes_per_big;
+	int len=n*2*bytes_per_big+1;
 	Big x,y;
 
 	if (mtable==NULL) return 0;
@@ -740,6 +747,7 @@ int G1::spill(char *& bytes)
 		to_binary(y,bytes_per_big,&bytes[j],TRUE);
 		j+=bytes_per_big;
 	}
+	bytes[j]=mtbits;
 	delete [] mtable; 
 	mtable=NULL;
 	return len;
@@ -753,7 +761,7 @@ void G1::restore(char *bytes)
 {
 	int i,j,n=(1<<WINDOW_SIZE);
 	int bytes_per_big=(MIRACL/8)*(get_mip()->nib-1);
-	int len=n*2*bytes_per_big;
+//	int len=n*2*bytes_per_big;
 	Big x,y;
 	if (mtable!=NULL) return;
 
@@ -766,6 +774,7 @@ void G1::restore(char *bytes)
 		j+=bytes_per_big;
 		mtable[i].set(x,y);
 	}
+	mtbits=bytes[j];
 	delete [] bytes;
 }
 
